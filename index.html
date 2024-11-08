@@ -149,7 +149,7 @@
 
       $('#btnFetch').click(fetchProducts);
       $('#btnAdd').click(addProduct);
-      $('#btnSaveChanges').click(updateProduct);
+      $('#btnSaveChanges').click(confirmUpdateProduct);
 
       function fetchProducts() {
         $.ajax({
@@ -176,7 +176,7 @@
                   <p class="card-content">가격: ${product.price}원</p>
                   <p class="card-content">할인율: ${product.discount}%</p>
                   <button class="btn btn-primary btn-sm" onclick="editProduct(${product.id})">수정</button>
-                  <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">삭제</button>
+                  <button class="btn btn-danger btn-sm" onclick="confirmDeleteProduct(${product.id})">삭제</button>
                 </div>
               </div>
             </div>`;
@@ -197,7 +197,10 @@
           alert('모든 필드를 입력하세요.');
           return;
         }
-
+        if (isNaN(product.price) || isNaN(product.discount)) {
+    alert('가격과 할인율에는 숫자만 입력해야 합니다.');
+    return;
+  }
         $.ajax({
           url: apiUrl,
           method: 'POST',
@@ -233,6 +236,12 @@
         });
       };
 
+      function confirmUpdateProduct() {
+        if (confirm('정말로 수정하시겠습니까?')) {
+          updateProduct();
+        }
+      }
+
       function updateProduct() {
         const updatedProduct = {
           name: $('#editName').val(),
@@ -241,7 +250,10 @@
           price: $('#editPrice').val(),
           discount: $('#editDiscount').val()
         };
-
+        if (isNaN(updatedProduct.price) || isNaN(updatedProduct.discount)) {
+    alert('가격과 할인율에는 숫자만 입력해야 합니다.');
+    return;
+  }
         if (editingId) {
           $.ajax({
             url: `${apiUrl}/${editingId}`,
@@ -260,7 +272,13 @@
         }
       }
 
-      window.deleteProduct = function (id) {
+      window.confirmDeleteProduct = function (id) {
+        if (confirm('정말로 삭제하시겠습니까?')) {
+          deleteProduct(id);
+        }
+      };
+
+      function deleteProduct(id) {
         $.ajax({
           url: `${apiUrl}/${id}`,
           method: 'DELETE',
@@ -273,6 +291,7 @@
         });
       };
     });
-  </script>
+</script>
+
 </body>
 </html>
